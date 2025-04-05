@@ -87,3 +87,41 @@ def organize_balanced_clean_data(root_directories, clean_data_path="/content/Cle
             f.write("\n".join(label_files[dataset]))
 
     print("✅ Data Organization Complete!")
+
+
+# if i had unlimited ram 
+def load_images_and_masks(clean_data_path, dataset_type="Training_Data"):
+    """
+    Loads images and corresponding masks from the given dataset folder, preserving RGB channels.
+
+    Args:
+        clean_data_path (str): Root folder where clean data is stored.
+        dataset_type (str): "Training_Data", "Validation_Data", or "Test_Data".
+
+    Returns:
+        X (numpy array): RGB images
+        Y (numpy array): Corresponding segmentation masks
+    """
+    dataset_path = os.path.join(clean_data_path, dataset_type, "Images")
+    images, masks = [], []
+
+    for img_file in os.listdir(dataset_path):
+        if img_file.endswith(".bmp"):
+            img_path = os.path.join(dataset_path, img_file)
+
+            # Load image in RGB (3-channel)
+            img = cv2.imread(img_path, cv2.IMREAD_COLOR)  # Keep RGB format
+            img = cv2.resize(img, IMG_SIZE) / 255.0  # Normalize pixel values
+
+            # Load segmentation mask (assuming masks are in a separate folder or created manually)
+            mask_path = img_path.replace("Images", "Masks")  # Modify path to find mask
+            if os.path.exists(mask_path):
+                mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)  # Keep as grayscale mask
+                mask = cv2.resize(mask, IMG_SIZE) / 255.0
+            else:
+                mask = np.zeros(IMG_SIZE)  # Placeholder if no mask available
+
+            images.append(img)
+            masks.append(mask)
+
+    return np.array(images).reshape(-1, 256, 256, 3), np.array(masks).reshape(-1, 256, 256, 1)
