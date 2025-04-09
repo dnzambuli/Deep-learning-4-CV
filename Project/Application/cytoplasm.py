@@ -6,9 +6,11 @@ import numpy as np
 import gdown
 import urllib.request
 import tensorflow as tf
+from tensorflow import keras 
 import os
 from dotenv import load_dotenv
 import sys
+import tempfile
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow info messages
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN if preferred
@@ -26,7 +28,7 @@ MODEL_GDRIVE_URL = os.getenv("CYTOPLASM_MODEL_URL")
 # Constants
 IMG_SIZE = (256, 256)
 MODEL_PATH = "pap_smear_model.keras"
-# MODEL_GDRIVE_URL = "https://drive.google.com/uc?id=1I0nk8MgDiUubKccBzKtCjNq1PQUA4r1l"
+
 
 # Load model
 def load_model():
@@ -43,7 +45,8 @@ def load_model():
                 raise FileNotFoundError("Model download failed")
         
         print("Loading model...")
-        return tf.keras.models.load_model(MODEL_PATH)
+        model = keras.models.load_model(MODEL_PATH)
+        return model
     
     except Exception as e:
         print(f"Error loading model: {str(e)}")
@@ -90,14 +93,14 @@ def upload_image():
 def capture_from_camera():
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use DirectShow on Windows for more stable access
     if not cap.isOpened():
-        messagebox.showerror("Error", "Cannot open webcam")
+        messagebox.showerror("Error", "Cannot open camera")
         return
 
     ret, frame = cap.read()
     cap.release()
 
     if not ret or frame is None:
-        messagebox.showerror("Error", "Failed to capture image from webcam.")
+        messagebox.showerror("Error", "Failed to capture image from camera.")
         return
 
     try:
@@ -117,9 +120,9 @@ def capture_from_camera():
 root = tk.Tk()
 root.title("Cell Cytoplasm Detection")
 
-tk.Label(root, text="Upload a microscope image or use webcam").pack(pady=10)
+tk.Label(root, text="Upload a microscope image or use camera").pack(pady=10)
 tk.Button(root, text="Upload Image", command=upload_image).pack(pady=5)
-tk.Button(root, text="Capture from Webcam", command=capture_from_camera).pack(pady=5)
+tk.Button(root, text="Capture from Camera", command=capture_from_camera).pack(pady=5)
 
 # Load model at startup
 model = load_model()
