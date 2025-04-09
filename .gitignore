@@ -1,3 +1,14 @@
 Project/datasets/
 *.ipynb_checkpoints
 Notes/OneNote_RecycleBin/
+Project/Application/.env
+*.tar
+.venv
+Project/Application/cytoplasm.spec
+Project/Application/build
+Project/Application/sample_images
+Project/Application/pap_smear_model.keras
+# Project/Application/requirements.txt
+Project/datasets.tar
+Project/Application/dist/
+
